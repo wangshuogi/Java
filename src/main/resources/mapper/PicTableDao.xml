@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace=".dao.PicTableDao">
+
+    <resultMap type=".entity.PicTable" id="PicTableMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="poiId" column="poi_id" jdbcType="VARCHAR"/>
+        <result property="picUrl" column="pic_url" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PicTableMap">
+        select id,
+               poi_id,
+               pic_url
+        from pic_table
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PicTableMap">
+        select
+        id, poi_id, pic_url
+        from pic_table
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="poiId != null and poiId != ''">
+                and poi_id = #{poiId}
+            </if>
+            <if test="picUrl != null and picUrl != ''">
+                and pic_url = #{picUrl}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from pic_table
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="poiId != null and poiId != ''">
+                and poi_id = #{poiId}
+            </if>
+            <if test="picUrl != null and picUrl != ''">
+                and pic_url = #{picUrl}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into pic_table(poi_id, pic_url)
+        values (#{poiId}, #{picUrl})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into pic_table(poi_id, pic_url)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.poiId}, #{entity.picUrl})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into pic_table(poi_id, pic_url)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.poiId}, #{entity.picUrl})
+        </foreach>
+        on duplicate key update
+        poi_id = values(poi_id),
+        pic_url = values(pic_url)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update pic_table
+        <set>
+            <if test="poiId != null and poiId != ''">
+                poi_id = #{poiId},
+            </if>
+            <if test="picUrl != null and picUrl != ''">
+                pic_url = #{picUrl},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from pic_table
+        where id = #{id}
+    </delete>
+
+</mapper>
+
